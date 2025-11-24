@@ -1,0 +1,53 @@
+# Netlify Configuration File
+
+[build]
+  # Directory to publish (your HTML files)
+  publish = "."
+  
+  # Build command (none needed for static HTML)
+  command = ""
+
+# Redirect rules
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-backend-api.azurewebsites.net/api/:splat"
+  status = 200
+  force = true
+  headers = {X-From = "Netlify"}
+
+# Custom headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer-when-downgrade"
+
+# SPA redirect (if needed)
+[[redirects]]
+  from = "/*"
+  to = "/claude.html"
+  status = 200
+  conditions = {Role = ["admin"]}
+
+# Cache control
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Environment variable placeholders
+[build.environment]
+  NODE_VERSION = "18"
+

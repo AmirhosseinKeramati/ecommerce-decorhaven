@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .status.loading {
+            background: #f39c12;
+            color: white;
+        }
+
+        .status.success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .status.error {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .info-box {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #bdc3c7;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .value {
+            color: #7f8c8d;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Backend Connection Test</h1>
+        <p class="subtitle">Testing Décor Haven API Connection</p>
+
+        <div class="status loading" id="status">
+            <span class="icon spinner">⏳</span>
+            <span id="statusText">Testing connection...</span>
+        </div>
+
+        <div class="info-box" id="infoBox">
+            <div class="info-row">
+                <span class="label">API URL:</span>
+                <span class="value" id="apiUrl">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Status:</span>
+                <span class="value" id="connectionStatus">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Response Time:</span>
+                <span class="value" id="responseTime">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Products Found:</span>
+                <span class="value" id="productsCount">-</span>
+            </div>
+        </div>
+
+        <button onclick="testConnection()" id="testBtn">
+            <span class="icon">🔄</span> Test Again
+        </button>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+
+        async function testConnection() {
+            const statusDiv = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+            const testBtn = document.getElementById('testBtn');
+
+            // Update UI
+            statusDiv.className = 'status loading';
+            statusText.innerHTML = '<span class="spinner">⏳</span> Testing connection...';
+            testBtn.disabled = true;
+
+            // Update info
+            document.getElementById('apiUrl').textContent = API_BASE_URL;
+            document.getElementById('connectionStatus').textContent = 'Testing...';
+            document.getElementById('responseTime').textContent = '-';
+            document.getElementById('productsCount').textContent = '-';
+
+            const startTime = Date.now();
+
+            try {
+                // Test products endpoint
+                const response = await fetch(`${API_BASE_URL}/products`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Success
+                    statusDiv.className = 'status success';
+                    statusText.innerHTML = '<span class="icon">✅</span> Backend Connected Successfully!';
+                    
+                    // Update info
+                    document.getElementById('connectionStatus').textContent = 'Connected';
+                    document.getElementById('responseTime').textContent = `${responseTime}ms`;
+                    
+                    if (data.success && data.data) {
+                        document.getElementById('productsCount').textContent = data.data.length;
+                    } else {
+                        document.getElementById('productsCount').textContent = '0';
+                    }
+                } else {
+                    // Error response
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+            } catch (error) {
+                // Connection failed
+                statusDiv.className = 'status error';
+                statusText.innerHTML = '<span class="icon">❌</span> Connection Failed';
+                
+                // Update info
+                document.getElementById('connectionStatus').textContent = `Error: ${error.message}`;
+                document.getElementById('responseTime').textContent = '-';
+                document.getElementById('productsCount').textContent = '-';
+
+                console.error('Connection error:', error);
+            } finally {
+                testBtn.disabled = false;
+            }
+        }
+
+        // Test on page load
+        window.addEventListener('load', testConnection);
+    </script>
+</body>
+</html>
+
