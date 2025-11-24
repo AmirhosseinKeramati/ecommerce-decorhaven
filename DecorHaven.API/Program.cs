@@ -14,9 +14,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Configure Database
+// Configure Database - Auto-detect SQL Server or PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    // Auto-detect database provider based on connection string
+    if (connectionString?.Contains("postgres", StringComparison.OrdinalIgnoreCase) == true)
+    {
+        // PostgreSQL (for Railway, Render, etc.)
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        // SQL Server (for Azure, local development)
+        options.UseSqlServer(connectionString);
+    }
+});
 
 // Configure JWT Settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
