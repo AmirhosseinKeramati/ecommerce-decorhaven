@@ -2,7 +2,7 @@
 # This file handles URL redirects and rewrites
 
 # API proxy to backend (update with your actual backend URL)
-/api/*  https://your-backend-api.azurewebsites.net/api/:splat  200
+/api/*  https://decorhaven-api.onrender.com:splat  200
 
 # SPA fallback - serve index file for all routes
 /*  /claude.html  200
