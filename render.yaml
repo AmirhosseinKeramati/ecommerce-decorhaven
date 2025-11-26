@@ -1,0 +1,27 @@
+services:
+  # Backend API Service
+  - type: web
+    name: decorhaven-api
+    runtime: dotnet
+    env: dotnet
+    buildCommand: cd DecorHaven.API && dotnet restore && dotnet publish -c Release -o out
+    startCommand: cd DecorHaven.API/out && dotnet DecorHaven.API.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:$PORT
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: decorhaven-db
+          property: connectionString
+    healthCheckPath: /health
+
+databases:
+  # PostgreSQL Database
+  - name: decorhaven-db
+    databaseName: decorhaven
+    user: decorhaven
+
