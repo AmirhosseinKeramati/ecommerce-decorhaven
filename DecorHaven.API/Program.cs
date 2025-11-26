@@ -66,8 +66,12 @@ builder.Services.AddAuthorization();
 // Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowNetlify", policy =>
     {
+        policy.WithOrigins(
+            "https://decoration-hyper.netlify.app",
+            "http://localhost:5173"
+        );
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader();
@@ -173,4 +177,5 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+app.UseCors("AllowNetlify");
 

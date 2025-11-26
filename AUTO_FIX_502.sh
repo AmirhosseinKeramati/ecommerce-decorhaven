@@ -31,3 +31,4 @@ netlify deploy --prod
 echo "✅ DONE! 502 error should be fixed!"
 echo "🌐 Test your site: https://decoration-hyper.netlify.app"
 
+

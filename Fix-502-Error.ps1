@@ -38,3 +38,4 @@ Write-Host "`n✅ DONE! 502 Error Fixed!" -ForegroundColor Green
 Write-Host "🌐 Test your site: https://decoration-hyper.netlify.app" -ForegroundColor Cyan
 Write-Host "🧪 Try logging in - it should work now!" -ForegroundColor Green
 
+
